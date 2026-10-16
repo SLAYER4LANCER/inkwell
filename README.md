@@ -20,22 +20,3 @@ text boxes, shapes, extra pages, undo/redo. Everything is stored on your phone. 
 افتح ملفات PDF وWord (‎.docx) وPowerPoint (‎.pptx) واكتب عليها بالقلم وقلم التمييز والممحاة والنصوص والأشكال.
 كل شيء يُحفظ على هاتفك. الواجهة بالإنجليزية والعربية.
 
-## الحصول على ملف APK (مجاني، حوالي 10 دقائق، بدون Android Studio)
-
-تحتاج حاسوباً (أو متصفح الهاتف بوضع "موقع سطح المكتب") وحساب GitHub مجاني.
-
-1. فك ضغط هذا المجلد.
-2. سجّل الدخول في <https://github.com> واضغط **New repository**، سمِّه `inkwell` ثم **Create repository**.
-3. في صفحة المستودع اضغط **uploading an existing file**، واسحب **كل محتويات المجلد** (بما فيها مجلد `.github`) ثم **Commit changes**.
-   - إن لم يُرفع مجلد `.github`: اضغط **Add file ← Create new file**، اكتب الاسم `.github/workflows/build-apk.yml`
-     وانسخ إليه محتوى الملف `build-apk.workflow.yml` ثم احفظ.
-4. افتح تبويب **Actions** ← **Build Android APK** ← **Run workflow**، وانتظر 5–10 دقائق حتى تظهر علامة ✓ الخضراء.
-5. افتح عملية التشغيل المكتملة، وفي قسم **Artifacts** نزّل **Inkwell-APK** ثم فك ضغطه لتحصل على `app-debug.apk`.
-6. انقل الملف إلى هاتفك وافتحه، واسمح بالتثبيت من هذا المصدر عندما يطلب أندرويد ذلك.
-
-إن فشل البناء (علامة ✗ حمراء) انسخ آخر 30 سطراً من سجل الخطوة الفاشلة وأرسلها لي.
-
-## ملاحظات
-
-- ملفات ‎.doc و‎.ppt القديمة غير مدعومة: افتحها في Word/PowerPoint واحفظها بصيغة ‎.docx / ‎.pptx.
-- في ملفات PowerPoint تظهر المخططات وSmartArt كمربع رمادي، ولا تُشغَّل الحركات.
