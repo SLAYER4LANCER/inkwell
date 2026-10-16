@@ -1,0 +1,6 @@
+cd Inkwell
+git init -b main
+git add -A
+git commit -m "Add Inkwell Android project"
+git remote add origin https://github.com/SLAYER4LANCER/inkwell.git
+git push -u origin main
