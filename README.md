@@ -3,28 +3,6 @@
 Open PDF, Word (.docx) and PowerPoint (.pptx) files and write on them: pen, highlighter, eraser,
 text boxes, shapes, extra pages, undo/redo. Everything is stored on your phone. English and Arabic.
 
-## Get the APK (free, about 10 minutes, no Android Studio needed)
-
-You need a computer (or a phone browser in "Desktop site" mode) and a free GitHub account.
-
-1. Unzip this folder.
-2. Sign in at <https://github.com> and click **New repository**. Name it `inkwell`, then **Create repository**.
-3. On the new repository page click **uploading an existing file**. Drag in **everything inside the
-   unzipped folder** (including the `.github` folder) and press **Commit changes**. Do not upload the .zip itself —
-   GitHub does not open zip files. The project is 79 files, which fits in one upload (the limit is 100).
-   - If the `.github` folder did not upload: click **Add file → Create new file**, type the name
-     `.github/workflows/build-apk.yml`, paste the contents of `build-apk.workflow.yml`, and commit.
-4. Open the **Actions** tab → **Build Android APK** → **Run workflow**. Wait 5–10 minutes for the green check.
-5. Open the finished run, scroll to **Artifacts**, download **Inkwell-APK**, unzip it, and you have `app-debug.apk`.
-6. Copy the APK to your phone and open it. Android will ask you to allow installing from this source — allow it.
-
-If the build fails (red X), open the failed step, copy the last 30 lines of the log and send them to me.
-
-## Use it without installing (web version)
-
-Everything in the `www` folder is a normal web app. Host the folder anywhere that serves HTTPS
-(for example GitHub Pages), open it in Chrome on your phone, and choose **Add to Home screen**.
-
 ## What is supported
 
 | Feature | Notes |
