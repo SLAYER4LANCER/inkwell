@@ -84,6 +84,16 @@ input { font: inherit; color: inherit; }
 .page canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
 .page canvas.hl { mix-blend-mode: multiply; opacity: .6; }
 .page canvas.hl, .page canvas.pen { pointer-events: none; }
+.sel { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.sel .sq { position: absolute; background: rgba(37, 99, 235, .28); border-radius: 2px; }
+.sel .sh { position: absolute; width: 44px; height: 48px; margin-left: -44px; pointer-events: auto; touch-action: none; cursor: grab; z-index: 3; }
+.sel .sh.e { margin-left: 0; }
+.sel .sh[hidden] { display: none; }
+.sel .sh::before { content: ''; position: absolute; right: -1px; top: 0; width: 2px; height: 10px; background: var(--accent); }
+.sel .sh.e::before { right: auto; left: -1px; }
+.sel .sh::after { content: ''; position: absolute; right: 0; top: 9px; width: 22px; height: 22px; border-radius: 50% 0 50% 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 5px rgba(0, 0, 0, .4); box-sizing: border-box; }
+.sel .sh.e::after { right: auto; left: 0; border-radius: 0 50% 50% 50%; }
+.mode-select .page { cursor: text; -webkit-touch-callout: none; }
 .page .pnum { position: absolute; inset-inline-end: 8px; bottom: 6px; font-size: 11px; color: rgba(0, 0, 0, .35); pointer-events: none; }
 .tl { position: absolute; inset: 0; pointer-events: none; }
 .tbox { position: absolute; pointer-events: none; min-width: 30px; }
@@ -153,3 +163,58 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 30px; }
 #busyBar { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
 .toast { position: fixed; left: 50%; bottom: calc(100px + var(--safe-b)); transform: translate(-50%, 20px); background: #1b2230; color: #fff; padding: 11px 18px; border-radius: 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 99; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- folders ---------- */
+.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; margin: 0 0 12px; font-size: 14px; }
+.crumbs button { padding: 6px 8px; border-radius: 9px; color: var(--accent); font-weight: 650; max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumbs button.cur { color: var(--ink); }
+.crumbs button:active { background: var(--accent-soft); }
+.crumbs .sepc { color: var(--muted); display: inline-flex; }
+[dir=rtl] .crumbs .sepc svg { transform: scaleX(-1); }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.fgrid:empty { display: none; }
+.fcard { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 6px 10px 12px; padding-inline: 12px 6px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-sm); cursor: pointer; min-width: 0; }
+.fcard:active { transform: scale(.985); }
+.fic { color: var(--accent); background: var(--accent-soft); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
+.fmeta { flex: 1; min-width: 0; }
+.fcard .name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fcard .sub { font-size: 12px; color: var(--muted); }
+.kebab2 { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--muted); flex: none; }
+.kebab2:active { background: var(--accent-soft); }
+.folder-empty, #folderEmpty { padding-top: 36px; }
+.card .chk { position: absolute; top: 8px; inset-inline-end: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, .92); color: transparent; display: none; align-items: center; justify-content: center; box-shadow: 0 0 0 2px rgba(27, 34, 48, .25), var(--shadow-sm); }
+#lib.selecting .card .chk { display: flex; }
+#lib.selecting .card .kebab { display: none; }
+.card.picked { outline: 3px solid var(--accent); outline-offset: -3px; }
+.card.picked .chk { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-sm); }
+.sel-bar { display: none; gap: 4px; }
+#lib.selecting .lib-bar { display: none; }
+#lib.selecting .sel-bar { display: flex; }
+#lib.selecting .fcard { opacity: .5; pointer-events: none; }
+.sel-count { flex: 1; font-weight: 700; font-size: 16px; padding: 0 6px; }
+.btn.sm { height: 38px; padding: 0 14px; }
+.fp-list { display: flex; flex-direction: column; gap: 2px; max-height: 50vh; overflow: auto; }
+.fp-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border-radius: 10px; text-align: start; }
+.fp-row:active { background: var(--accent-soft); }
+.fp-row:disabled { opacity: .38; pointer-events: none; }
+.fp-row.cur { color: var(--accent); font-weight: 700; }
+.fp-row span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actions .btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- text selection bar ---------- */
+.selbar { position: absolute; top: calc(var(--safe-t) + 62px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 2px; padding: 5px; background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); border: 1px solid var(--line); z-index: 40; max-width: calc(100% - 12px); }
+.selbar button { height: 42px; min-width: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font-weight: 650; color: var(--ink); flex: none; }
+.selbar button:active { background: var(--accent-soft); }
+.selbar .sb-dot { width: 32px; min-width: 32px; height: 32px; border-radius: 50%; background: var(--c); padding: 0; margin: 0 3px; box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, .2); }
+.selbar .sb-dot:active { background: var(--c); transform: scale(.9); }
+.sb-sep { width: 1px; height: 26px; background: var(--line); margin: 0 4px; flex: none; }
+.selbar:not([data-m="1"]) .m-only { display: none; }
+@media (max-width: 440px) {
+  .tools { gap: 0; padding: 5px; }
+  .tools button { width: 38px; height: 44px; }
+  .selbar button { padding: 0 8px; min-width: 38px; }
+  .selbar .sb-dot { margin: 0 2px; }
+}
+
+/* typing text: the toolbar steps aside and a Done button takes its place above the keyboard */
+.done-pill { display: none; position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(14px + var(--safe-b)); z-ind
