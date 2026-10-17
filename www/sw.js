@@ -1,6 +1,6 @@
 // Offline cache for the web (PWA) version. The Android app ships these files inside the APK.
-const CACHE = 'inkwell-v1';
-const CORE = ['./', 'index.html', 'style.css', 'manifest.webmanifest', 'js/app.js', 'js/db.js', 'js/i18n.js', 'js/icons.js', 'js/ink.js', 'js/pdf.js', 'js/pagebg.js', 'js/export.js', 'js/rasterize.js', 'js/import-docx.js', 'js/import-pptx.js', 'icons/icon-192.png'];
+const CACHE = 'inkwell-v4';
+const CORE = ['./', 'index.html', 'style.css', 'manifest.webmanifest', 'js/app.js', 'js/db.js', 'js/i18n.js', 'js/icons.js', 'js/ink.js', 'js/pdf.js', 'js/pagebg.js', 'js/export.js', 'js/rasterize.js', 'js/textlayer.js', 'js/autoink.js', 'js/openwith.js', 'js/import-docx.js', 'js/import-pptx.js', 'icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
