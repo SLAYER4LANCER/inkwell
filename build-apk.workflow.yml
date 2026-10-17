@@ -1,0 +1,97 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Works with the project files in the repository, with the project inside a folder, or with the single
+      # Inkwell-Android-Project.zip. If both a zip and loose files exist, whichever was uploaded last is used.
+      - name: Find the project
+        id: find
+        run: |
+          ZIP=$(ls ./*.zip 2>/dev/null | head -n 1 || true)
+          ZT=0; RT=0
+          if [ -n "$ZIP" ]; then ZT=$(git log -1 --format=%ct -- "$ZIP"); fi
+          if [ -f package.json ] && grep -q '"inkwell-notes"' package.json; then RT=$(git log -1 --format=%ct -- package.json www); fi
+          if [ -n "$ZIP" ] && [ "$ZT" -gt "$RT" ]; then
+            echo "Using $ZIP"
+            unzip -q "$ZIP" -d unpacked
+            PKG=$(grep -rl --include=package.json --exclude-dir=node_modules '"inkwell-notes"' unpacked | head -n 1)
+            DIR=$(dirname "$PKG")
+          elif [ "$RT" -gt 0 ]; then
+            DIR=.
+          else
+            PKG=$(grep -rl --include=package.json --exclude-dir=node_modules '"inkwell-notes"' . | head -n 1 || true)
+            DIR=$(dirname "${PKG:-./missing/package.json}")
+          fi
+          echo "Project folder: $DIR"
+          if [ ! -f "$DIR/package.json" ]; then
+            echo "Could not find the Inkwell project (package.json) in this repository."
+            ls -la
+            exit 1
+          fi
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        working-directory: ${{ steps.find.outputs.dir }}
+        run: npm install
+
+      - name: Create the Android project
+        working-directory: ${{ steps.find.outputs.dir }}
+        run: |
+          npx cap add android
+          node scripts/prepare-android.mjs
+          npx cap sync android
+
+      # Every build is signed with the same key, so a new APK installs over the old one and keeps your notes.
+      - name: Use the fixed signing key and a new version number
+        working-directory: ${{ steps.find.outputs.dir }}
+        run: |
+          mkdir -p ~/.android
+          if [ -f signing/debug.keystore ]; then cp signing/debug.keystore ~/.android/debug.keystore; else echo "No signing/debug.keystore found - a temporary key will be used"; fi
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
+      - name: Build the APK
+        working-directory: ${{ steps.find.outputs.dir }}/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Keep the APK as a download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Inkwell-APK
+          path: ${{ steps.find.outputs.dir }}/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      # Also publish it on the Releases page, where the APK can be downloaded and installed directly.
+      - name: Publish a release with the APK
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Inkwell build ${{ github.run_number }}
+          prerelease: true
+          files: ${{ steps.find.outputs.dir }}/android/app/build/outputs/apk/debug/app-debug.apk
