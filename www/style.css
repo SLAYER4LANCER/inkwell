@@ -216,5 +216,5 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 30px; }
   .selbar .sb-dot { margin: 0 2px; }
 }
 
-/* typing text: the toolbar steps aside and a Done button takes its place above the keyboard */
-.done-pill { display: none; position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(14px + var(--safe-b)); z-ind
+/* typing text: the toolbar steps aside and a bar with colour, size and Done sits above the keyboard */
+.text-bar { display: none; position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(10px + var(--safe-b))
