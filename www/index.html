@@ -23,7 +23,15 @@
         <span data-icon="search"></span>
         <input id="q" type="search" data-i18n-ph="search" autocomplete="off">
       </label>
+      <button id="btnFolder" class="ib" data-i18n-title="newFolder"><span data-icon="folderPlus"></span></button>
       <button id="btnSettings" class="ib" data-i18n-title="settings"><span data-icon="sliders"></span></button>
+    </header>
+    <header id="libSel" class="bar sel-bar">
+      <button id="selCancel" class="ib" data-i18n-title="cancel"><span data-icon="close"></span></button>
+      <span id="selCount" class="sel-count"></span>
+      <button id="selAll" class="btn sm" data-i18n="selectAll"></button>
+      <button id="selMove" class="ib" data-i18n-title="moveTo"><span data-icon="move"></span></button>
+      <button id="selDel" class="ib" data-i18n-title="del"><span data-icon="trash"></span></button>
     </header>
     <main class="lib-main">
       <div id="empty" class="empty" hidden>
@@ -31,6 +39,14 @@
         <h2 data-i18n="emptyTitle">Your library is empty</h2>
         <p data-i18n="emptyText"></p>
       </div>
+      <nav id="crumbs" class="crumbs" hidden></nav>
+      <div id="folderEmpty" class="empty" hidden>
+        <div class="empty-art" aria-hidden="true"><span data-icon="folder" data-size="40"></span></div>
+        <h2 data-i18n="folderEmpty"></h2>
+        <p data-i18n="folderEmptyText"></p>
+      </div>
+      <div id="folderHead" class="sec-title" data-i18n="folders" hidden></div>
+      <div id="fgrid" class="fgrid"></div>
       <div id="gridHead" class="sec-title" data-i18n="recent">Recent</div>
       <div id="grid" class="grid"></div>
     </main>
@@ -40,6 +56,7 @@
         <button data-act="docx"><span data-icon="word"></span><span data-i18n="importWord"></span></button>
         <button data-act="pptx"><span data-icon="slides"></span><span data-i18n="importPpt"></span></button>
         <button data-act="blank"><span data-icon="notebook"></span><span data-i18n="newNote"></span></button>
+        <button data-act="folder"><span data-icon="folderPlus"></span><span data-i18n="newFolder"></span></button>
       </div>
       <button id="fab" class="fab" data-i18n-title="importDoc"><span data-icon="plus" data-size="28"></span></button>
     </div>
@@ -63,6 +80,7 @@
     </div>
     <div id="tools" class="tools" role="toolbar">
       <button data-tool="hand" data-i18n-title="hand"><span data-icon="hand"></span></button>
+      <button data-tool="select" data-i18n-title="select"><span data-icon="select"></span></button>
       <button data-tool="pen" data-i18n-title="pen"><span data-icon="pen"></span></button>
       <button data-tool="hl" data-i18n-title="hl"><span data-icon="hl"></span></button>
       <button data-tool="eraser" data-i18n-title="eraser"><span data-icon="eraser"></span></button>
@@ -70,6 +88,8 @@
       <button data-tool="shape" data-i18n-title="shapes"><span data-icon="shapes"></span></button>
       <button id="colorDot" class="color-dot" data-i18n-title="color"><i></i></button>
     </div>
+    <button id="textDone" class="done-pill" data-i18n="done"></button>
+    <div id="selbar" class="selbar" hidden></div>
     <div id="pop" class="pop" hidden></div>
     <div id="edMenu" class="menu ed-menu" hidden></div>
   </section>
