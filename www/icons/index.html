@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Inkwell</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Start-up check: if the app does not start (a file of the update is missing or old), say which one instead of showing a dead screen. -->
+  <script>
+  (function () {
+    var BUILD = 'r8';
+    var FILES = ['js/app.js', 'js/autoink.js', 'js/db.js', 'js/export.js', 'js/i18n.js', 'js/icons.js', 'js/import-docx.js', 'js/import-pptx.js', 'js/ink.js', 'js/openwith.js', 'js/pagebg.js', 'js/pdf.js', 'js/rasterize.js', 'js/textlayer.js', 'style.css', 'vendor/jszip.min.js', 'vendor/pdf-lib.min.js', 'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js'];
+    var errs = [];
+    window.addEventListener('error', function (e) { errs.push(String(e.message || (e.target && (e.target.src || e.target.href)) || 'error')); }, true);
+    window.addEventListener('unhandledrejection', function (e) { errs.push('Promise: ' + String((e.reason && e.reason.message) || e.reason)); });
+    function booted() {
+      if (window.__inkBooted) return true;
+      var s = document.querySelector('#fab span');
+      return !!(s && s.innerHTML.length > 0);
+    }
+    function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+    function show(bad) {
+      if (booted() || document.getElementById('inkDiag')) return;
+      var d = document.createElement('div');
+      d.id = 'inkDiag';
+      d.style.cssText = 'position:fixed;inset:0;z-index:99999;overflow:auto;background:#12161d;color:#e8ecf2;font:16px/1.5 system-ui,sans-serif;padding:24px 20px;-webkit-user-select:text;user-select:text';
+      var list = bad.length ? bad.map(function (b) { return '<li dir="ltr"><b>www/' + esc(b[0]) + '</b> &mdash; ' + (b[1] === 'MISSING' ? 'missing (ناقص)' : 'old version (نسخة قديمة)') + '</li>'; }).join('') : '';
+      var P = '<p style="margin:12px 0">', AR = '<p dir="rtl" style="margin:12px 0">';
+      d.innerHTML = '<h2 style="margin:0 0 4px;color:#f59e0b">Inkwell could not start</h2><h2 dir="rtl" style="margin:0 0 14px;color:#f59e0b">تعذّر تشغيل Inkwell</h2>' +
+        (bad.length
+          ? P + 'These files in your GitHub repository are missing or from an older update:</p>' + AR + 'هذه الملفات في مستودع GitHub ناقصة أو من نسخة أقدم:</p><ul style="padding-left:22px;line-height:1.9">' + list + '</ul>'
+          : P + 'All files are there, but the app still stopped.</p>' + AR + 'كل الملفات موجودة لكن التطبيق توقف.</p>') +
+        P + '<b>Fix:</b> upload <b>Inkwell-Android-Project.zip</b> by itself to the main page of the repository, then wait for the new build (or upload the files above again, in the same folders).</p>' +
+        AR + '<b>الحل:</b> ارفع ملف <b>Inkwell-Android-Project.zip</b> وحده في الصفحة الرئيسية للمستودع وانتظر البناء الجديد (أو أعد رفع الملفات المذكورة أعلاه في نفس المجلدات).</p>' +
+        (errs.length ? '<p dir="ltr" style="color:#9aa5b5;font-size:13px;word-break:break-word">' + errs.slice(0, 4).map(esc).join('<br>') + '</p>' : '') +
+        '<p dir="ltr" style="color:#9aa5b5;font-size:13px">build ' + BUILD + '</p>' +
+        '<button type="button" style="margin-top:6px;padding:10px 22px;border:0;border-radius:12px;background:#334155;color:#fff;font:inherit" onclick="this.parentNode.remove()">Close / إغلاق</button>';
+      document.body.appendChild(d);
+    }
+    function check() {
+      if (booted()) return;
+      var bad = [], left = FILES.length;
+      FILES.forEach(function (f) {
+        var p = fetch(f, { cache: 'no-store' }).then(function (r) {
+          if (!r.ok) { bad.push([f, 'MISSING']); return; }
+          if (f.indexOf('js/') !== 0) return;
+          return r.text().then(function (t) { if (t.indexOf('inkwell-build:' + BUILD) < 0) bad.push([f, 'OLD']); });
+        }).catch(function () { bad.push([f, 'MISSING']); });
+        p.then(function () { if (--left === 0) show(bad); });
+      });
+    }
+    setTimeout(check, 3500);
+  })();
+  </script>
+</head>
+<body>
+  <!-- Library -->
+  <section id="lib" class="view">
+    <header class="bar lib-bar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"><img src="icons/icon-192.png" alt="" width="30" height="30"></span>
+        <span data-i18n="app">Inkwell</span>
+      </div>
+      <label class="search">
+        <span data-icon="search"></span>
+        <input id="q" type="search" data-i18n-ph="search" autocomplete="off">
+      </label>
+      <button id="btnFolder" class="ib" data-i18n-title="newFolder"><span data-icon="folderPlus"></span></button>
+      <button id="btnSettings" class="ib" data-i18n-title="settings"><span data-icon="sliders"></span></button>
+    </header>
+    <header id="libSel" class="bar sel-bar">
+      <button id="selCancel" class="ib" data-i18n-title="cancel"><span data-icon="close"></span></button>
+      <span id="selCount" class="sel-count"></span>
+      <button id="selAll" class="btn sm" data-i18n="selectAll"></button>
+      <button id="selMove" class="ib" data-i18n-title="moveTo"><span data-icon="move"></span></button>
+      <button id="selDel" class="ib" data-i18n-title="del"><span data-icon="trash"></span></button>
+    </header>
+    <main class="lib-main">
+      <div id="empty" class="empty" hidden>
+        <div class="empty-art" aria-hidden="true"><span data-icon="pdf" data-size="34"></span><span data-icon="word" data-size="34"></span><span data-icon="slides" data-size="34"></span></div>
+        <h2 data-i18n="emptyTitle">Your library is empty</h2>
+        <p data-i18n="emptyText"></p>
+      </div>
+      <nav id="crumbs" class="crumbs" hidden></nav>
+      <div id="folderEmpty" class="empty" hidden>
+        <div class="empty-art" aria-hidden="true"><span data-icon="folder" data-size="40"></span></div>
+        <h2 data-i18n="folderEmpty"></h2>
+        <p data-i18n="folderEmptyText"></p>
+      </div>
+      <div id="folderHead" class="sec-title" data-i18n="folders" hidden></div>
+      <div id="fgrid" class="fgrid"></div>
+      <div id="gridHead" class="sec-title" data-i18n="recent">Recent</div>
+      <div id="grid" class="grid"></div>
+    </main>
+    <div class="fab-wrap">
+      <div id="fabMenu" class="menu fab-menu" hidden>
+        <button data-act="pdf"><span data-icon="pdf"></span><span data-i18n="importPdf"></span></button>
+        <button data-act="docx"><span data-icon="word"></span><span data-i18n="importWord"></span></button>
+        <button data-act="pptx"><span data-icon="slides"></span><span data-i18n="importPpt"></span></button>
+        <button data-act="blank"><span data-icon="notebook"></span><span data-i18n="newNote"></span></button>
+        <button data-act="folder"><span data-icon="folderPlus"></span><span data-i18n="newFolder"></span></button>
+      </div>
+      <button id="fab" class="fab" data-i18n-title="importDoc"><span data-icon="plus" data-size="28"></span></button>
+    </div>
+  </section>
+
+  <!-- Editor -->
+  <section id="ed" class="view" hidden>
+    <header class="bar ed-bar">
+      <button id="edBack" class="ib" data-i18n-title="back"><span data-icon="back"></span></button>
+      <button id="edTitle" class="ed-title"></button>
+      <span id="pageInd" class="page-ind"></span>
+      <button id="btnUndo" class="ib" data-i18n-title="undo"><span data-icon="undo"></span></button>
+      <button id="btnRedo" class="ib" data-i18n-title="redo"><span data-icon="redo"></span></button>
+      <button id="btnMore" class="ib" data-i18n-title="more"><span data-icon="more"></span></button>
+    </header>
+    <div id="scroller"><div id="pages"></div></div>
+    <div class="zoom-ctl">
+      <button id="zIn" class="ib round" data-i18n-title="zoom"><span data-icon="zoomIn" data-size="20"></span></button>
+      <button id="zOut" class="ib round" data-i18n-title="zoom"><span data-icon="zoomOut" data-size="20"></span></button>
+      <button id="zFit" class="ib round" data-i18n-title="fit"><span data-icon="fit" data-size="20"></span></button>
+    </div>
+    <div id="tools" class="tools" role="toolbar">
+      <button data-tool="hand" data-i18n-title="hand"><span data-icon="hand"></span></button>
+      <button data-tool="select" data-i18n-title="select"><span data-icon="select"></span></button>
+      <button data-tool="pen" data-i18n-title="pen"><span data-icon="pen"></span></button>
+      <button data-tool="hl" data-i18n-title="hl"><span data-icon="hl"></span></button>
+      <button data-tool="eraser" data-i18n-title="eraser"><span data-icon="eraser"></span></button>
+      <button data-tool="text" data-i18n-title="text"><span data-icon="text"></span></button>
+      <button data-tool="shape" data-i18n-title="shapes"><span data-icon="shapes"></span></button>
+      <button id="colorDot" class="color-dot" data-i18n-title="color"><i></i></button>
+    </div>
+    <div id="textBar" class="text-bar">
+      <div id="tbSw" class="tb-sw"></div>
+      <div id="tbSizes" class="tb-sizes"></div>
+      <div class="tb-row">
+        <button id="tbMinus" class="tb-btn" data-i18n-title="textSmaller"><span style="font-size:13px">A</span></button>
+        <button id="tbNum" class="tb-btn tb-num" data-i18n-title="textSize"></button>
+        <button id="tbPlus" class="tb-btn" data-i18n-title="textBigger"><span style="font-size:23px">A</span></button>
+        <button id="textDone" class="done-pill" data-i18n="done"></button>
+      </div>
+    </div>
+    <div id="selbar" class="selbar" hidden></div>
+    <div id="pop" class="pop" hidden></div>
+    <div id="edMenu" class="menu ed-menu" hidden></div>
+  </section>
+
+  <div id="sheet" class="sheet-back" hidden></div>
+  <div id="busy" class="busy" hidden>
+    <div class="busy-card"><div class="spin"></div><div id="busyText"></div><div class="bar-track"><div id="busyBar"></div></div></div>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <input id="file" type="file" multiple hidden>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
